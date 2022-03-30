@@ -9,6 +9,14 @@ on:
         required: true
       CONTAINER_REGISTRY_HOST:
         required: true
+      APP_CREATE_INGRESS:
+        required: true
+      GIT_HELM_REPO:
+        required: true
+      GIT_HELM_SSK_KEY:
+        required: true
+      KUBECONFIG:
+        required: true
 
 jobs:
   pre_work:
