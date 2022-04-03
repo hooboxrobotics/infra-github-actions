@@ -2,11 +2,47 @@
 
 Repositório que centraliza as GitHub Actions que serão consumidos por todos os repositórios.
 
-As rotinas automáticas aqui separam o processo de _Continuous Integration_ de _Continuous Delivery_. 
+## Fazendo deploy com este repositório
 
-Basicamente, o primeiro (CI) irá se encarregar de testar e _buildar_ a aplicação, visando tornar disponível uma versão da mesma para posterior deploy, enquanto que o segundo (CD) efetivamente faz o deploy da versão que foi criada pelo CI.
+As rotinas automáticas aqui separam o processo de _Continuous Integration_ de _Continuous Delivery_, e a junção das duas rotinas é o que o mercado chama de CI/CD.
 
-Para correto funcionamento, exige que o repositório onde a Action será executada possua as seguintes _secrets_:
+O processo de _Continuous Integration_ consiste em testar e tornar disponível para um processo de deploy uma versão de uma aplicação. Como as aplicações da Hoobox são servidas por meio de containers, este processo culmina na entrega de um container no Container Registry da Hoobox.
+
+O processo de _Continuous Delivery_, por sua vez, se encarrega de entregar este container em execução no cluster de Kubernetes da Hoobox, substituindo qualquer outro container com uma versão anterior da aplicação.
+
+Abaixo, um exemplo de como chamar o workflow de CI/CD deste repositório a partir de outro:
+
+```yaml
+name: build and push container
+
+on:
+  push:
+    branches:
+    - "develop"
+    - "main"
+
+jobs:
+  cicd:
+    uses: hooboxrobotics/infra-github-actions/.github/workflows/cicd.yaml@main
+    with:
+      run_ci: true
+      run_cd: true
+    secrets:
+      ...
+```
+
+Note que você pode controlar quais etapas deseja que sejam realizadas por meio das variáveis `run_ci` e `run_cd`.
+
+
+## Dependência do Helm
+
+Esta rotina foi criada com o intuito de, em última instância, chamar para o processo de _Continuous Deploy_ o repositório [infra-helm-apps](https://github.com/hooboxrobotics/infra-helm-apps).
+
+Futuramente, será dado suporte à repositórios com Helm Charts genéricos, e as variáveis [Secrets](#secrets) individuais serão substituídas por um JSON com suporte à valores dinâmicos.
+
+## Secrets 
+
+O correto funcionamento deste repositório depende da declaração das seguintes _Secrets_:
 
 |                 Variável|  Tipo  |Descrição     |
 |------------------------:|:------:|:-------------|
@@ -24,29 +60,3 @@ Para correto funcionamento, exige que o repositório onde a Action será executa
 
 Além disto, o repositório que estiver reutilizando as rotinas aqui existentes deve conter também um workflow semelhante à este abaixo:
 
-```yaml
-name: build and push container
-
-on:
-  push:
-    branches:
-    - "develop"
-    - "main"
-  workflow_dispatch:
-
-jobs:
-  cicd:
-    uses: hooboxrobotics/infra-github-actions/.github/workflows/cicd.yaml@main
-    with:
-      run_ci: true
-      run_cd: true
-    secrets:
-      KUBECONFIG: ${{ secrets.KUBECONFIG }}
-      GIT_HELM_REPO: ${{ secrets.GIT_HELM_REPO }}
-      GIT_HELM_SSK_KEY: ${{ secrets.GIT_HELM_SSK_KEY }}
-      APP_CREATE_INGRESS: ${{ secrets.APP_CREATE_INGRESS }}
-      CONTAINER_REGISTRY_USER: ${{ secrets.CONTAINER_REGISTRY_USER }}
-      CONTAINER_REGISTRY_PASS: ${{ secrets.CONTAINER_REGISTRY_PASS }}
-      CONTAINER_REGISTRY_HOST: ${{ secrets.CONTAINER_REGISTRY_HOST }}
-
-```
