@@ -123,7 +123,7 @@ jobs:
       id: domain
       run: |
         case "${{ github.repository }}" in
-          */np-api*) echo "::set-output name=value::${{ steps.domain_prefix.outputs.value }}-api.homol.np.com.br" ;;
+          */np-api*) echo "::set-output name=value::${{ steps.domain_prefix.outputs.value }}-api.homol.np.hoobox.one" ;;
 
           */shared-api*) echo "::set-output name=value::${{ steps.domain_prefix.outputs.value }}-api.homol.hoobox.one" ;;
         esac
