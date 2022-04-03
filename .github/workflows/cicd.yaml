@@ -24,7 +24,7 @@ on:
         required: true
       GIT_HELM_SSK_KEY:
         required: true
-      KUBECONFIG:
+      KUBERNETES_CONFIG:
         required: true
 
 jobs:
@@ -143,7 +143,7 @@ jobs:
     - name: deploy the application
       uses: WyriHaximus/github-action-helm3@v2
       with:
-        kubeconfig: '${{ secrets.KUBECONFIG }}'
+        kubeconfig: '${{ secrets.KUBERNETES_CONFIG }}'
         exec: |
           helm upgrade ${{ needs.pre_work.outputs.image_name }} \
             --create-namespace --namespace ${{ steps.namespace.outputs.value }} \
