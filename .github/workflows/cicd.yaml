@@ -2,6 +2,15 @@ name: build and push container
 
 on:
   workflow_call:
+    inputs:
+      run_ci:
+        type: boolean
+        default: true
+        required: false
+      run_cd:
+        type: boolean
+        default: true
+        required: false
     secrets:
       CONTAINER_REGISTRY_USER:
         required: true
@@ -36,6 +45,7 @@ jobs:
 
   test_application:
     runs-on: ubuntu-latest
+    if: inputs.run_ci
     strategy:
       matrix:
         node-version: [17.x]
@@ -61,6 +71,7 @@ jobs:
 
   container_build:
     runs-on: ubuntu-latest
+    if: inputs.run_ci
     needs:
     - pre_work
     - test_application
@@ -92,6 +103,7 @@ jobs:
 
   deploy_application:
     runs-on: ubuntu-latest
+    if: inputs.run_cd
     needs:
     - pre_work
     - container_build
