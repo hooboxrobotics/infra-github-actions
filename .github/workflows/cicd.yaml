@@ -126,8 +126,9 @@ jobs:
       id: domain
       run: |
         case "${{ github.repository }}" in
-          */np-api*)      echo "::set-output name=value::${{ steps.domain_prefix.outputs.value }}-api.homol.np.hoobox.one" ;;
-          */np-frontend*) echo "::set-output name=value::${{ steps.domain_prefix.outputs.value }}.homol.np.hoobox.one" ;;
+          */np-api*)        echo "::set-output name=value::${{ steps.domain_prefix.outputs.value }}-api.homol.np.hoobox.one" ;;
+          */np-frontend*)   echo "::set-output name=value::${{ steps.domain_prefix.outputs.value }}.homol.np.hoobox.one" ;;
+          */np-integrador*) echo "::set-output name=value::${{ steps.domain_prefix.outputs.value }}-integrador.homol.np.hoobox.one" ;;
           
           */npv1-api*)      echo "::set-output name=value::${{ steps.domain_prefix.outputs.value }}-api.homol.neonpass.com.br" ;;
           */npv1-frontend*) echo "::set-output name=value::${{ steps.domain_prefix.outputs.value }}.homol.neonpass.com.br" ;;
