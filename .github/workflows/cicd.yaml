@@ -29,9 +29,9 @@ on:
       APP_MYSQL_ENABLED:
         required: true
       APP_MINIO_ENABLED:
-        required: true
+        required: false
       APP_MEMCACHED_ENABLED:
-        required: true
+        required: false
       
 
 jobs:
