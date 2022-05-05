@@ -26,6 +26,13 @@ on:
         required: true
       KUBERNETES_CONFIG:
         required: true
+      APP_MYSQL_ENABLED:
+        required: true
+      APP_MINIO_ENABLED:
+        required: true
+      APP_MEMCACHED_ENABLED:
+        required: true
+      
 
 jobs:
   pre_work:
