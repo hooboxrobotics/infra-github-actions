@@ -39,6 +39,7 @@ jobs:
   pre_work:
     runs-on: ubuntu-latest
     outputs:
+      context: ${{ steps.context.outputs.value }}
       image_name: ${{ steps.image_name.outputs.value }}
       image_tag: ${{ steps.image_tag.outputs.value }}
     steps:
@@ -50,6 +51,17 @@ jobs:
     - name: set the container repository name
       id: image_tag
       run: echo "::set-output name=value::$(echo $GITHUB_SHA | cut -c 1-6)"
+
+    - name: set the target context
+      id: context
+      run: |
+        if [[ "${GITHUB_REF#refs/heads/}" = "main" ]]; then
+          echo "::set-output name=value::prod"
+        elif [[ "${GITHUB_REF#refs/heads/}" = "develop" ]]; then
+          echo "::set-output name=value::homol"
+        elif [[ "${GITHUB_REF#refs/heads/}" = "staging" ]]; then
+          echo "::set-output name=value::staging"
+        fi
 
   test_application:
     runs-on: ubuntu-latest
@@ -154,6 +166,8 @@ jobs:
 
     - name: deploy the application
       uses: WyriHaximus/github-action-helm3@v2
+      env:
+        HELM_KUBECONTEXT: ${{ needs.pre_work.outputs.context }}
       with:
         kubeconfig: '${{ secrets.KUBERNETES_CONFIG }}'
         exec: |
