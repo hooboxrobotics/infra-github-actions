@@ -11,6 +11,9 @@ on:
         type: boolean
         default: true
         required: false
+      domain:
+        type: string
+        required: true
     secrets:
       CONTAINER_REGISTRY_USER:
         required: true
@@ -145,17 +148,13 @@ jobs:
     - name: set the deployment domain
       id: domain
       run: |
-        case "${{ github.repository }}" in
-          */np-api*)        echo "::set-output name=value::${{ steps.domain_prefix.outputs.value }}-api.homol.np.hoobox.one" ;;
-          */np-frontend*)   echo "::set-output name=value::${{ steps.domain_prefix.outputs.value }}.homol.np.hoobox.one" ;;
-          */np-integrador*) echo "::set-output name=value::${{ steps.domain_prefix.outputs.value }}-hsl.homol.hoobox.one" ;;
-          
-          */npv1-api*)      echo "::set-output name=value::${{ steps.domain_prefix.outputs.value }}-api.homol.neonpass.com.br" ;;
-          */npv1-frontend*) echo "::set-output name=value::${{ steps.domain_prefix.outputs.value }}.homol.neonpass.com.br" ;;
-          
-          */shared-api*)      echo "::set-output name=value::${{ steps.domain_prefix.outputs.value }}-api.homol.hoobox.one" ;;
-          */shared-frontend*) echo "::set-output name=value::${{ steps.domain_prefix.outputs.value }}.homol.hoobox.one" ;;
-        esac
+        if [[ "${GITHUB_REF#refs/heads/}" = "main" ]]; then
+          echo "::set-output name=value::{{ inputs.domain }}"
+        elif [[ "${GITHUB_REF#refs/heads/}" = "develop" ]]; then
+          echo "::set-output name=value::homol.{{ inputs.domain }}"
+        elif [[ "${GITHUB_REF#refs/heads/}" = "staging" ]]; then
+          echo "::set-output name=value::staging.{{ inputs.domain }}"
+        fi
 
     - name: checkout helm repo
       uses: actions/checkout@v3
