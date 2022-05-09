@@ -149,11 +149,11 @@ jobs:
       id: domain
       run: |
         if [[ "${GITHUB_REF#refs/heads/}" = "main" ]]; then
-          echo "::set-output name=value::${{ inputs.domain }}"
+          echo "::set-output name=value::${{ steps.domain_prefix.outputs.value }}.${{ inputs.domain }}"
         elif [[ "${GITHUB_REF#refs/heads/}" = "develop" ]]; then
-          echo "::set-output name=value::homol.${{ inputs.domain }}"
+          echo "::set-output name=value::${{ steps.domain_prefix.outputs.value }}.homol.${{ inputs.domain }}"
         elif [[ "${GITHUB_REF#refs/heads/}" = "staging" ]]; then
-          echo "::set-output name=value::staging.${{ inputs.domain }}"
+          echo "::set-output name=value::${{ steps.domain_prefix.outputs.value }}.staging.${{ inputs.domain }}"
         fi
 
     - name: checkout helm repo
