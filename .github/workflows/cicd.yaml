@@ -145,16 +145,34 @@ jobs:
       id: domain_prefix
       run: echo "::set-output name=value::$(echo ${{ github.repository }} | cut -d/ -f2 | cut -d\- -f3)"
 
+    - name: set the deployment domain sufix
+      id: domain_suffix
+      run: |
+        if [[ "${GITHUB_REF#refs/heads/}" = "main" ]]; then
+          echo "::set-output name=value::${{ inputs.domain }}"
+        elif [[ "${GITHUB_REF#refs/heads/}" = "develop" ]]; then
+        echo "::set-output name=value::homol.${{ inputs.domain }}"
+        elif [[ "${GITHUB_REF#refs/heads/}" = "staging" ]]; then
+          echo "::set-output name=value::staging.${{ inputs.domain }}"
+        fi
+
+
     - name: set the deployment domain
       id: domain
       run: |
-        if [[ "${GITHUB_REF#refs/heads/}" = "main" ]]; then
-          echo "::set-output name=value::${{ steps.domain_prefix.outputs.value }}.${{ inputs.domain }}"
-        elif [[ "${GITHUB_REF#refs/heads/}" = "develop" ]]; then
-          echo "::set-output name=value::${{ steps.domain_prefix.outputs.value }}.homol.${{ inputs.domain }}"
-        elif [[ "${GITHUB_REF#refs/heads/}" = "staging" ]]; then
-          echo "::set-output name=value::${{ steps.domain_prefix.outputs.value }}.staging.${{ inputs.domain }}"
-        fi
+        case "${{ github.repository }}" in
+          */*-api*)
+            echo "::set-output name=value::${{ steps.domain_prefix.outputs.value }}-api.${{ steps.domain_suffix.outputs.value }}"
+          ;;
+
+          */*-frontend*)
+            echo "::set-output name=value::${{ steps.domain_prefix.outputs.value }}.${{ steps.domain_suffix.outputs.value }}"
+          ;;
+
+          */*-integrador*)
+            echo "::set-output name=value::${{ steps.domain_prefix.outputs.value }}-hsl.${{ steps.domain_suffix.outputs.value }}"
+          ;;
+        esac
 
     - name: checkout helm repo
       uses: actions/checkout@v3
