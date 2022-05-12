@@ -14,6 +14,28 @@ on:
       domain:
         type: string
         required: true
+      mysql_enabled:
+        type: boolean
+        default: false
+        required: false
+      minio_enabled:
+        type: boolean
+        default: false
+        required: false
+      memcached_enabled:
+        type: boolean
+        default: false
+        required: false
+      database_enabled:
+        type: boolean
+        required: true
+      bucket_enabled:
+        type: boolean
+        required: true
+      helm_repository:
+        type: string
+        required: true
+
     secrets:
       CONTAINER_REGISTRY_USER:
         required: true
@@ -23,22 +45,10 @@ on:
         required: true
       APP_CREATE_INGRESS:
         required: true
-      GIT_HELM_REPO:
-        required: true
       GIT_HELM_SSK_KEY:
         required: true
       KUBERNETES_CONFIG:
         required: true
-      APP_MYSQL_ENABLED:
-        required: true
-      APP_MINIO_ENABLED:
-        required: false
-      APP_MEMCACHED_ENABLED:
-        required: false
-      APP_DATABASE_ENABLED:
-        required: false
-      APP_BUCKET_ENABLED:
-        required: false
 
 jobs:
   pre_work:
@@ -181,7 +191,7 @@ jobs:
       with:
         path: "helm_apps"
         ssh-key: ${{ secrets.GIT_HELM_SSK_KEY }}
-        repository: ${{ secrets.GIT_HELM_REPO }}
+        repository: ${{ inputs.helm_repository }}
 
     - name: deploy the application
       uses: WyriHaximus/github-action-helm3@v2
@@ -196,10 +206,10 @@ jobs:
             --set CreateIngress=${{ secrets.APP_CREATE_INGRESS }} \
             --set-string AppDomain=${{ steps.domain.outputs.value }} \
             --set-string Version=${{ needs.pre_work.outputs.image_tag }} \
-            --set global.MinioEnabled=${{ secrets.APP_MINIO_ENABLED }} \
-            --set global.MySQLEnabled=${{ secrets.APP_MYSQL_ENABLED }} \
-            --set global.DatabaseEnabled=${{ secrets.APP_DATABASE_ENABLED }} \
-            --set global.BucketEnabled=${{ secrets.APP_BUCKET_ENABLED }} \
-            --set global.MemcachedEnabled=${{ secrets.APP_MEMCACHED_ENABLED }} \
+            --set global.MinioEnabled=${{ inputs.minio_enabled }} \
+            --set global.MySQLEnabled=${{ inputs.mysql_enabled }} \
+            --set global.DatabaseEnabled=${{ inputs.database_enabled }} \
+            --set global.BucketEnabled=${{ inputs.bucket_enabled }} \
+            --set global.MemcachedEnabled=${{ inputs.memcached_enabled }} \
             --set-string global.GitRevParse=`cd helm_apps && git rev-parse --short HEAD` \
             --install helm_apps
