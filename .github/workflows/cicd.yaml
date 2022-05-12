@@ -37,6 +37,8 @@ on:
         required: false
       APP_DATABASE_ENABLED:
         required: false
+      APP_BUCKET_ENABLED:
+        required: false
 
 jobs:
   pre_work:
@@ -197,6 +199,7 @@ jobs:
             --set global.MinioEnabled=${{ secrets.APP_MINIO_ENABLED }} \
             --set global.MySQLEnabled=${{ secrets.APP_MYSQL_ENABLED }} \
             --set global.DatabaseEnabled=${{ secrets.APP_DATABASE_ENABLED }} \
+            --set global.BucketEnabled=${{ secrets.APP_BUCKET_ENABLED }} \
             --set global.MemcachedEnabled=${{ secrets.APP_MEMCACHED_ENABLED }} \
             --set-string global.GitRevParse=`cd helm_apps && git rev-parse --short HEAD` \
             --install helm_apps
