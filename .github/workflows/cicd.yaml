@@ -35,6 +35,9 @@ on:
       helm_repository:
         type: string
         required: true
+      create_ingress:
+        type: boolean
+        required: true
 
     secrets:
       CONTAINER_REGISTRY_USER:
@@ -42,8 +45,6 @@ on:
       CONTAINER_REGISTRY_PASS:
         required: true
       CONTAINER_REGISTRY_HOST:
-        required: true
-      APP_CREATE_INGRESS:
         required: true
       GIT_HELM_SSK_KEY:
         required: true
@@ -203,7 +204,7 @@ jobs:
           helm upgrade ${{ needs.pre_work.outputs.image_name }} \
             --create-namespace --namespace ${{ steps.namespace.outputs.value }} \
             --set-string ContainerRegistry=${{ secrets.CONTAINER_REGISTRY_HOST }} \
-            --set CreateIngress=${{ secrets.APP_CREATE_INGRESS }} \
+            --set CreateIngress=${{ inputs.create_ingress }} \
             --set-string AppDomain=${{ steps.domain.outputs.value }} \
             --set-string Version=${{ needs.pre_work.outputs.image_tag }} \
             --set global.MinioEnabled=${{ inputs.minio_enabled }} \
