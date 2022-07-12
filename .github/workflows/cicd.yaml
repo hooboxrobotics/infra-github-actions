@@ -175,7 +175,7 @@ jobs:
             echo "::set-output name=value::${{ steps.domain_prefix.outputs.value }}-hsl.${{ steps.domain_suffix.outputs.value }}"
           ;;
 
-          */*-dash*)
+          */*room*)
             echo "::set-output name=value::${{ steps.domain_prefix.outputs.value }}.room.${{ steps.domain_suffix.outputs.value }}"
           ;;
         esac
